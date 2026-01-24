@@ -117,6 +117,18 @@ spec:
                   cd VBench &&
                   mkdir -p /workspace/.cache &&
                   export VBENCH_CACHE_DIR=/workspace/.cache &&
+                  wget -P https://github.com/LAION-AI/aesthetic-predictor/blob/main/sa_0_4_vit_l_14_linear.pth?raw=true /workspace/.cache/aesthetic_model/emb_reader/sa_0_4_vit_l_14_linear.pth &&
+                  wget https://huggingface.co/lalala125/AMT/resolve/main/amt-s.pth -P /workspace/.cache/amt_model &&
+                  wget https://huggingface.co/spaces/xinyu1205/recognize-anything/resolve/main/tag2text_swin_14m.pth -P /workspace/.cache/vbench/caption_model &&
+                  wget https://openaipublic.azureedge.net/clip/models/40d365715913c9da98579312b702a82c18be219cc2a73407c4526f58eba950af/ViT-B-32.pt -P /workspace/.cache/vbench/clip_model &&
+                  wget https://openaipublic.azureedge.net/clip/models/b8cca3fd41ae0c99ba7e8951adf17d267cdb84cd88be6f7c2e0eca1737a03836/ViT-L-14.pt -P /workspace/.cache/vbench/clip_model &&
+                  wget https://huggingface.co/OpenGVLab/VBench_Used_Models/resolve/main/grit_b_densecap_objectdet.pth -P /workspace/.cache/vbench/grit_model &&
+                  wget https://github.com/chaofengc/IQA-PyTorch/releases/download/v0.1-weights/musiq_spaq_ckpt-358bb6af.pth -P /workspace/.cache/vbench/pyiqa_model &&
+                  wget -P /workspace/.cache/raft_model/ https://dl.dropboxusercontent.com/s/4j4z58wuv8o0mfz/models.zip &&
+                  unzip -d /workspace/.cache/raft_model/ /workspace/.cache/raft_model/models.zip &&
+                  rm -r /workspace/.cache/raft_model/models.zip &&
+                  wget https://huggingface.co/OpenGVLab/VBench_Used_Models/resolve/main/l16_ptk710_ftk710_ftk400_f16_res224.pth -P  /workspace/.cache/vbench/umt_model/ &&
+                  wget https://huggingface.co/OpenGVLab/VBench_Used_Models/resolve/main/ViClip-InternVid-10M-FLT.pth -P /workspace/.cache/vbench/ViCLIP &&
                   aws s3 cp s3://agi-mm-training-shared-us-east-2/beidchen/data/wan_fewstep_topk_vbench_videos /workspace/vbench_videos --region us-east-2 --recursive &&
                   torchrun --nproc_per_node=8 --rdzv-conf="timeout=7200,read_timeout=7200,join_timeout=7200" evaluate.py --output_path /checkpoints-fsx/beidchen-sandbox/vbench_eval_results/wan_fewstep_topk --videos_path /workspace/vbench_videos --wandb_name wan_fewstep_topk --dimension subject_consistency background_consistency temporal_flickering motion_smoothness dynamic_degree aesthetic_quality imaging_quality object_class multiple_objects human_action color spatial_relationship scene temporal_style appearance_style overall_consistency --mode vbench_standard 2>&1 | tee /code-fsx/beidchen-sandbox/wan_fewstep_topk_vbench.log
               image: 767397878797.dkr.ecr.us-east-1.amazonaws.com/agif-mm-pt-base:reasoning-vllm.sglang.megatron.deepseek.video.fa3
