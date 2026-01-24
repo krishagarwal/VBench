@@ -1,10 +1,11 @@
 import torch
 import os
 from vbench import VBench
-from vbench.distributed import dist_init, print0
+from vbench.distributed import dist_init, print0, get_rank, barrier
 from datetime import datetime
 import argparse
 import json
+import wandb
 
 def parse_args():
 
@@ -99,6 +100,12 @@ def parse_args():
         4. 'None': no preprocessing
         """,
     )
+
+    parser.add_argument(
+        "--wandb_name",
+        type=str,
+        required=True,
+    )
     args = parser.parse_args()
     return args
 
@@ -107,6 +114,16 @@ def main():
     args = parse_args()
 
     dist_init()
+
+    if get_rank() == 0:
+        wandb_run = wandb.init(
+            config=vars(args),
+            name=args.wandb_name,
+            mode="online",
+            project="vbench",
+            dir=f"/workspace/wandb",
+        )
+
     print0(f'args: {args}')
     device = torch.device("cuda")
     my_VBench = VBench(device, args.full_json_dir, args.output_path)
@@ -148,6 +165,12 @@ def main():
     )
     print0('done')
 
+    if get_rank() == 0:
+        os.system("zip -r /workspace/evaluation_results.zip " + args.output_path)
+        wandb_run.save("/workspace/evaluation_results.zip")
+        wandb_run.finish()
+
+    barrier()
 
 if __name__ == "__main__":
     main()
