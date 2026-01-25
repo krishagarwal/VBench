@@ -117,7 +117,8 @@ spec:
                   cd VBench &&
                   mkdir -p /workspace/.cache &&
                   export VBENCH_CACHE_DIR=/workspace/.cache &&
-                  wget -P https://github.com/LAION-AI/aesthetic-predictor/blob/main/sa_0_4_vit_l_14_linear.pth?raw=true /workspace/.cache/aesthetic_model/emb_reader/sa_0_4_vit_l_14_linear.pth &&
+                  mkdir -p /workspace/.cache/aesthetic_model/emb_reader/ &&
+                  wget -O /workspace/.cache/aesthetic_model/emb_reader/sa_0_4_vit_l_14_linear.pth https://github.com/LAION-AI/aesthetic-predictor/blob/main/sa_0_4_vit_l_14_linear.pth?raw=true &&
                   wget https://huggingface.co/lalala125/AMT/resolve/main/amt-s.pth -P /workspace/.cache/amt_model &&
                   wget https://huggingface.co/spaces/xinyu1205/recognize-anything/resolve/main/tag2text_swin_14m.pth -P /workspace/.cache/vbench/caption_model &&
                   wget https://openaipublic.azureedge.net/clip/models/40d365715913c9da98579312b702a82c18be219cc2a73407c4526f58eba950af/ViT-B-32.pt -P /workspace/.cache/vbench/clip_model &&
