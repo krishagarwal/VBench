@@ -167,13 +167,9 @@ def main():
     print0('done')
 
     if get_rank() == 0:
-        out_dir = os.path.abspath(args.output_path.rstrip(os.sep))
-        out_base = os.path.basename(out_dir)          # folder name to appear in the zip
-        out_parent = os.path.dirname(out_dir)         # run zip from here
-
         subprocess.run(
-            ["zip", "-r", "/workspace/evaluation_results.zip", out_base],
-            cwd=out_parent,
+            ["zip", "-r", "/workspace/evaluation_results.zip", "."],
+            cwd=args.output_path,
             check=True
         )
         os.system("zip -r /workspace/evaluation_results.zip " + args.output_path)
