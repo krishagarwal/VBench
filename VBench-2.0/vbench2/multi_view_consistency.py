@@ -18,6 +18,15 @@ import json
 from vbench2.utils import load_dimension_info, split_video_into_scenes
 from tqdm import tqdm
 
+from .distributed import (
+    get_world_size,
+    get_rank,
+    all_gather,
+    barrier,
+    distribute_list_to_rank,
+    gather_list_of_dict,
+)
+
 def transform_class360(vector, min_reso, factor=0.008): # 768*0.05
     scale = min_reso * factor
     up, down, y = vector
@@ -35,12 +44,20 @@ class CameraPredict:
         self.grid_size = 10
         self.number_points = 1
         try:
-            self.model = torch.hub.load(submodules_list["repo"], submodules_list["model"]).to(self.device)
+            if get_rank() == 0:
+                self.model = torch.hub.load(submodules_list["repo"], submodules_list["model"]).to(self.device)
+            barrier()
+            if get_rank() != 0:
+                self.model = torch.hub.load(submodules_list["repo"], submodules_list["model"]).to(self.device)
         except:
             # workaround for CERTIFICATE_VERIFY_FAILED (see: https://github.com/pytorch/pytorch/issues/33288#issuecomment-954160699)
             import ssl
             ssl._create_default_https_context = ssl._create_unverified_context
-            self.model = torch.hub.load(submodules_list["repo"], submodules_list["model"]).to(self.device)
+            if get_rank() == 0:
+                self.model = torch.hub.load(submodules_list["repo"], submodules_list["model"]).to(self.device)
+            barrier()
+            if get_rank() != 0:
+                self.model = torch.hub.load(submodules_list["repo"], submodules_list["model"]).to(self.device)
 
     def transform360(self, vector):
         up=[]

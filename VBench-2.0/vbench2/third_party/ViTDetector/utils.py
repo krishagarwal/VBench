@@ -12,6 +12,15 @@ import torch.distributed as dist
 import numpy as np
 from scipy import interpolate
 
+from ...distributed import (
+    get_world_size,
+    get_rank,
+    all_gather,
+    barrier,
+    distribute_list_to_rank,
+    gather_list_of_dict,
+)
+
 try:
     # noinspection PyUnresolvedReferences
     from apex import amp
@@ -22,8 +31,13 @@ except ImportError:
 def load_checkpoint(config, model, optimizer, lr_scheduler, logger):
     logger.info(f">>>>>>>>>> Resuming from {config.MODEL.RESUME} ..........")
     if config.MODEL.RESUME.startswith('https'):
-        checkpoint = torch.hub.load_state_dict_from_url(
-            config.MODEL.RESUME, map_location='cpu', check_hash=True)
+        if get_rank() == 0:
+            checkpoint = torch.hub.load_state_dict_from_url(
+                config.MODEL.RESUME, map_location='cpu', check_hash=True)
+        barrier()
+        if get_rank() != 0:
+            checkpoint = torch.hub.load_state_dict_from_url(
+                config.MODEL.RESUME, map_location='cpu', check_hash=True)
     else:
         checkpoint = torch.load(config.MODEL.RESUME, map_location='cpu', weights_only=False)
     msg = model.load_state_dict(checkpoint['model'], strict=False)

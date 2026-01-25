@@ -8,6 +8,15 @@ import PIL.Image
 import sys
 import torch
 
+from .....distributed import (
+    get_world_size,
+    get_rank,
+    all_gather,
+    barrier,
+    distribute_list_to_rank,
+    gather_list_of_dict,
+)
+
 try:
     from .correlation import correlation # the custom cost volume layer
 except:
@@ -294,7 +303,12 @@ class Network(torch.nn.Module):
         self.netSubpixel = torch.nn.ModuleList([ Subpixel(intLevel) for intLevel in [ 2, 3, 4, 5, 6 ] ])
         self.netRegularization = torch.nn.ModuleList([ Regularization(intLevel) for intLevel in [ 2, 3, 4, 5, 6 ] ])
 
-        self.load_state_dict({ strKey.replace('module', 'net'): tenWeight for strKey, tenWeight in torch.hub.load_state_dict_from_url(url='http://content.sniklaus.com/github/pytorch-liteflownet/network-' + arguments_strModel + '.pytorch').items() })
+        if get_rank() == 0:
+            state_dict = torch.hub.load_state_dict_from_url(url='http://content.sniklaus.com/github/pytorch-liteflownet/network-' + arguments_strModel + '.pytorch')
+        barrier()
+        if get_rank() != 0:
+            state_dict = torch.hub.load_state_dict_from_url(url='http://content.sniklaus.com/github/pytorch-liteflownet/network-' + arguments_strModel + '.pytorch')
+        self.load_state_dict({ strKey.replace('module', 'net'): tenWeight for strKey, tenWeight in state_dict.items() })
         # self.load_state_dict(torch.load('./liteflownet/network-default.pth'))
     # end
 
