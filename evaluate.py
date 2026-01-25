@@ -1,5 +1,6 @@
 import torch
 import os
+import subprocess
 from vbench import VBench
 from vbench.distributed import dist_init, print0, get_rank, barrier
 from datetime import datetime
@@ -166,8 +167,17 @@ def main():
     print0('done')
 
     if get_rank() == 0:
+        out_dir = os.path.abspath(args.output_path.rstrip(os.sep))
+        out_base = os.path.basename(out_dir)          # folder name to appear in the zip
+        out_parent = os.path.dirname(out_dir)         # run zip from here
+
+        subprocess.run(
+            ["zip", "-r", "/workspace/evaluation_results.zip", out_base],
+            cwd=out_parent,
+            check=True
+        )
         os.system("zip -r /workspace/evaluation_results.zip " + args.output_path)
-        wandb_run.save("/workspace/evaluation_results.zip")
+        wandb_run.save("/workspace/evaluation_results.zip", base_path="/workspace")
         wandb_run.finish()
 
     barrier()
