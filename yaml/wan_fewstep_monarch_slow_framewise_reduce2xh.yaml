@@ -36,7 +36,7 @@ spec:
                         values:
                           - p5en.48xlarge
           tolerations:
-            - key: barijit-pro-model-rl-ablations-nnc7
+            - key: dmodolo-mm-rl
               operator: Equal
               value: "True"
               effect: NoSchedule

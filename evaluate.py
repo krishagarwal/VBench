@@ -172,7 +172,6 @@ def main():
             cwd=args.output_path,
             check=True
         )
-        os.system("zip -r /workspace/evaluation_results.zip " + args.output_path)
         wandb_run.save("/workspace/evaluation_results.zip", base_path="/workspace")
         wandb_run.finish()
 
