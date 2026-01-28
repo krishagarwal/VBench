@@ -114,8 +114,6 @@ spec:
                   cd .. &&
                   python -m pip install -e detectron2 --no-build-isolation &&
                   pip install setuptools==69.5.1 &&
-                  cd /checkpoints-fsx/beidchen-sandbox/vbench_eval_results &&
-                  rm -rf self_forcing_monarch_slow_framewise &&
                   cd VBench &&
                   mkdir -p /workspace/.cache/vbench/ &&
                   export VBENCH_CACHE_DIR=/workspace/.cache/vbench &&
