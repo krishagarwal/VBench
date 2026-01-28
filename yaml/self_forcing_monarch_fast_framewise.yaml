@@ -114,6 +114,7 @@ spec:
                   cd .. &&
                   python -m pip install -e detectron2 --no-build-isolation &&
                   pip install setuptools==69.5.1 &&
+                  cd VBench &&
                   mkdir -p /workspace/.cache/vbench/ &&
                   export VBENCH_CACHE_DIR=/workspace/.cache/vbench &&
                   mkdir -p /workspace/.cache/vbench/aesthetic_model/emb_reader/ &&
