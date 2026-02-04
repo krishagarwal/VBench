@@ -20,4 +20,4 @@
 # kubectl apply -f yaml/wan_fewstep_svg2_0.90.yaml
 # kubectl apply -f yaml/wan_fewstep_svg2_0.95.yaml
 kubectl apply -f yaml/self_forcing_14b.yaml
-# kubectl apply -f yaml/self_forcing_monarch_fast_framewise_14b.yaml
+kubectl apply -f yaml/self_forcing_monarch_fast_framewise_14b.yaml
